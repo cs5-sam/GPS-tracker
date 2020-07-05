@@ -50,16 +50,16 @@ public class MainActivity extends AppCompatActivity {
         mainLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(i);
+                Intent in = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(in);
             }
         });
 
         mainRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i =new Intent(MainActivity.this,RegisterActivity.class);
-                startActivity(i);
+                Intent myInt =new Intent(MainActivity.this,RegisterActivity.class);
+                startActivity(myInt);
             }
         });
     }

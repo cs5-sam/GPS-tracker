@@ -1,6 +1,9 @@
 package android.example.gpatrackerapp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -8,7 +11,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -39,9 +49,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserLocationMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+public class UserLocationMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback
+, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     GoogleMap mMap;
+    GoogleApiClient client;
+    LocationRequest request;
+
+    LatLng latLng;
 
     FirebaseAuth auth;
 
@@ -53,6 +68,7 @@ public class UserLocationMainActivity extends AppCompatActivity implements Navig
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
+
         auth = FirebaseAuth.getInstance();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -86,10 +102,13 @@ public class UserLocationMainActivity extends AppCompatActivity implements Navig
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        client = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+        .addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .build();
+
+        client.connect();
     }
 
     @Override
@@ -141,5 +160,44 @@ public class UserLocationMainActivity extends AppCompatActivity implements Navig
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        request = new LocationRequest().create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(3000);
+
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(client,request,this);
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if(location == null){
+            Toast.makeText(this, "Not able to get location", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+            MarkerOptions options = new MarkerOptions();
+            options.position(latLng);
+            options.title("Current location");
+            mMap.addMarker(options);
+        }
     }
 }
