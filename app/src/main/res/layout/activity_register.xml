@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity">
+
+    <EditText
+        android:id="@+id/register_email_edit"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter email"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/editColor"
+        android:layout_marginTop="150dp"
+        android:layout_centerVertical="true"
+        android:inputType="textEmailAddress"/>
+    <Button
+        android:id="@+id/register_email_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textAllCaps="false"/>
+
+</RelativeLayout>

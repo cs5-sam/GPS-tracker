@@ -1,0 +1,2 @@
+rootProject.name='GPA Tracker App'
+include ':app'
